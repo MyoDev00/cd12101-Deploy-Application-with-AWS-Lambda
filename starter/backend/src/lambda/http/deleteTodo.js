@@ -1,8 +1,14 @@
+import cors from '@middy/http-cors'
 
-export function handler(event) {
-  const todoId = event.pathParameters.todoId
+export const handler = middy()
+  .use(
+    cors({
+      credentials: true
+    })
+  )
+  .handler(async (event) => {
+    const todoId = event.pathParameters.todoId
 
-  // TODO: Remove a TODO item by id
-  return undefined
-}
-
+    // TODO: Remove a TODO item by id
+    return undefined
+  })

@@ -11,5 +11,10 @@ export const handler = middy()
     const todoId = event.pathParameters.todoId
 
     // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
-    return getUploadUrl(todoId)
+    const uploadUrl = getUploadUrl(todoId)
+    if (!uploadUrl) return undefined
+
+    return {
+      uploadUrl: uploadUrl
+    }
   })

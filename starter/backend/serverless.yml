@@ -1,7 +1,10 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: udacitycourse
 service: serverless-todo-app
 
 plugins:
   - serverless-iam-roles-per-function
+  - serverless-offline
 
 frameworkVersion: '4'
 
@@ -10,7 +13,6 @@ provider:
   runtime: nodejs16.x
   stage: ${opt:stage, 'dev'}
   region: ${opt:region, 'us-east-1'}
-  
   environment:
     TODOS_TABLE: Todo-${self:provider.stage}
     TODO_USER_ID_INDEX: TodoUserIdIndex
@@ -29,7 +31,7 @@ functions:
           method: get
           path: todos
           cors: true
-          autorizer: Auth
+          authorizer: Auth
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
@@ -46,7 +48,7 @@ functions:
           method: post
           path: todos
           cors: true
-          autorizer: Auth
+          authorizer: Auth
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
@@ -62,7 +64,7 @@ functions:
           method: patch
           path: todos/{todoId}
           cors: true
-          autorizer: Auth
+          authorizer: Auth
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
@@ -78,7 +80,7 @@ functions:
           method: delete
           path: todos/{todoId}
           cors: true
-          autorizer: Auth
+          authorizer: Auth
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
@@ -94,7 +96,7 @@ functions:
           method: post
           path: todos/{todoId}/attachment
           cors: true
-          autorizer: Auth
+          authorizer: Auth
     iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
@@ -106,6 +108,17 @@ functions:
 resources:
   Resources:
     # TODO: Add any necessary AWS resources
+    GatewayResponseDefault4XX:
+      Type: AWS::ApiGateway::GatewayResponse
+      Properties:
+        ResponseParameters:
+          gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+          gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+          gatewayresponse.header.Access-Control-Allow-Methods: "'GET,OPTIONS,POST,DELETE'"
+        ResponseType: DEFAULT_4XX
+        RestApiId:
+          Ref: ApiGatewayRestApi
+
     TodosDynamoDBTable:
       Type: AWS::DynamoDB::Table
       Properties:
@@ -114,15 +127,7 @@ resources:
             AttributeType: S
           - AttributeName: userId
             AttributeType: S
-          - AttributeName: attachmentUrl
-            AttributeType: S
           - AttributeName: dueDate
-            AttributeType: S
-          - AttributeName: createdAt
-            AttributeType: S
-          - AttributeName: name
-            AttributeType: S
-          - AttributeName: done
             AttributeType: S
         KeySchema:
           - AttributeName: todoId
@@ -133,10 +138,12 @@ resources:
         TableName: ${self:provider.environment.TODOS_TABLE}
         GlobalSecondaryIndexes:
           - IndexName: ${self:provider.environment.TODO_USER_ID_INDEX}
-          KeySchema:
-          - AttributeName: userId
-            KeyType: HASH
-ttachmentsBucket:
+            KeySchema:
+              - AttributeName: userId
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+    AttachmentsBucket:
       Type: AWS::S3::Bucket
       Properties:
         BucketName: ${self:provider.environment.IMAGES_S3_BUCKET}
@@ -145,8 +152,7 @@ ttachmentsBucket:
           RestrictPublicBuckets: false
         CorsConfiguration:
           CorsRules:
-            -
-              AllowedOrigins:
+            - AllowedOrigins:
                 - '*'
               AllowedHeaders:
                 - '*'
@@ -163,7 +169,7 @@ ttachmentsBucket:
       Properties:
         PolicyDocument:
           Id: MyPolicy
-          Version: "2012-10-17"
+          Version: '2012-10-17'
           Statement:
             - Sid: PublicReadForGetBucketObjects
               Effect: Allow

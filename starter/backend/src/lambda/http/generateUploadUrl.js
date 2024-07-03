@@ -1,4 +1,5 @@
 import cors from '@middy/http-cors'
+import middy from '@middy/core'
 import { getUploadUrl } from '../../fileStorage/attachmentUtils.mjs'
 
 export const handler = middy()
@@ -12,9 +13,12 @@ export const handler = middy()
 
     // TODO: Return a presigned URL to upload a file for a TODO item with the provided id
     const uploadUrl = getUploadUrl(todoId)
-    if (!uploadUrl) return undefined
+    if (!uploadUrl) return { statusCode: 500 }
 
     return {
-      uploadUrl: uploadUrl
+      statusCode: 201,
+      body: JSON.stringify({
+        uploadUrl: uploadUrl
+      })
     }
   })

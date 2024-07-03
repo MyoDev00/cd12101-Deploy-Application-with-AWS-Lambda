@@ -1,4 +1,5 @@
 import cors from '@middy/http-cors'
+import middy from '@middy/core'
 import { getAllTodos } from '../../businessLogic/todo.mjs'
 import { getUserId } from '../auth/utils.mjs'
 
@@ -14,5 +15,17 @@ export const handler = middy()
     const userId = getUserId(authorization)
 
     const todos = await getAllTodos(userId)
-    return todos
+
+    if (!todos) {
+      return {
+        statusCode: 400
+      }
+    }
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        items: todos
+      })
+    }
   })

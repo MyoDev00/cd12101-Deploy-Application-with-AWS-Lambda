@@ -1,7 +1,7 @@
 import * as uuid from 'uuid'
-import { TodoAccess } from '../dataLayer/todosAccess.mjs'
+import { TodosAccess } from '../dataLayer/todosAccess.mjs'
 
-const todoAccess = new TodoAccess()
+const todoAccess = new TodosAccess()
 
 export async function getAllTodos(userId) {
   return todoAccess.getAllTodos(userId)

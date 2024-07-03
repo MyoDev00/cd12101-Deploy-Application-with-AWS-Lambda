@@ -1,4 +1,5 @@
 import cors from '@middy/http-cors'
+import middy from '@middy/core'
 import { deleteTodo } from '../../businessLogic/todo.mjs'
 import { getUserId } from '../auth/utils.mjs'
 
@@ -13,5 +14,14 @@ export const handler = middy()
 
     const result = await deleteTodo(todoId)
 
-    return result
+    if (!result) {
+      return {
+        statusCode: 500
+      }
+    }
+
+    return {
+      statusCode: 201,
+      body: JSON.stringify({})
+    }
   })

@@ -1,4 +1,5 @@
 import cors from '@middy/http-cors'
+import middy from '@middy/core'
 import { updateTodo } from '../../businessLogic/todo.mjs'
 import { getUserId } from '../auth/utils.mjs'
 
@@ -16,12 +17,17 @@ export const handler = middy()
     var result = await updateTodo(updatedTodo, todoId)
 
     if (!result) {
-      return undefined
+      return {
+        statusCode: 500
+      }
     }
 
     return {
-      name: result.name,
-      dueDate: result.dueDate,
-      done: result.done
+      statusCode: 200,
+      body: JSON.stringify({
+        name: result.name,
+        dueDate: result.dueDate,
+        done: result.done
+      })
     }
   })

@@ -25,9 +25,11 @@ export const handler = middy()
     return {
       statusCode: 200,
       body: JSON.stringify({
-        name: result.name,
-        dueDate: result.dueDate,
-        done: result.done
+        item: {
+          name: result.name,
+          dueDate: result.dueDate,
+          done: result.done
+        }
       })
     }
   })

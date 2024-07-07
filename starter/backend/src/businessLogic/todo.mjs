@@ -36,12 +36,11 @@ export async function deleteTodo(todoId) {
 }
 
 export async function generateUploadUrl(todoId) {
-  const bucketName = process.env.IMAGES_S3_BUCKET
-  const attachmentUrl = `https://${bucketName}.s3.amazonaws.com/${todoId}`
-  const url = await getUploadUrl(todoId)
+  const uploadUrl = await getUploadUrl(todoId)
+  const attachmentUrl = uploadUrl.split('?')[0]
 
   await todoAccess.updateAttachment(todoId, attachmentUrl)
 
-  console.log(`Generate and saved image url ${url}`)
-  return url
+  console.log(`Generated and saved image url ${attachmentUrl}`)
+  return uploadUrl
 }

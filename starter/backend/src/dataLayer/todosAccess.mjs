@@ -57,7 +57,7 @@ export class TodosAccess {
     try {
       await this.dynamoDbClient.update({
         TableName: this.todosTable,
-        Key: { todoId: todo.todoId },
+        Key: { todoId: todo.todoId, userId: todo.userId },
         UpdateExpression: 'set name = :nameValue, completed = :completedValue',
         ExpressionAttributeValues: {
           ':nameValue': todo.name,
@@ -74,11 +74,11 @@ export class TodosAccess {
     }
   }
 
-  async updateAttachment(todoId, url) {
+  async updateAttachment(todoId, userId, url) {
     try {
       await this.dynamoDbClient.update({
         TableName: this.todosTable,
-        Key: { todoId },
+        Key: { todoId: todoId, userId: userId },
         UpdateExpression: 'set attachmentUrl = :url',
         ExpressionAttributeValues: {
           ':url': url
@@ -91,17 +91,15 @@ export class TodosAccess {
     }
   }
 
-  async deleteTodo(todoId) {
+  async deleteTodo(todoId, userId) {
     console.log(`Deleting todo with todoId ${todoId}`)
-    const params = {
-      TableName: this.todosTable
-    }
 
     try {
       await this.dynamoDbClient.delete({
         TableName: this.todosTable,
         Key: {
-          todoId: todoId
+          todoId: todoId,
+          userId: userId
         }
       })
       logger.info('Delete Todo')

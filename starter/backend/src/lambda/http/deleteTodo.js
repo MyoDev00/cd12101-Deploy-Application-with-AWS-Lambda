@@ -11,7 +11,10 @@ export const handler = middy()
   )
   .handler(async (event) => {
     const todoId = event.pathParameters.todoId
-    const result = await deleteTodo(todoId)
+    const authorization = event.headers.Authorization
+    const userId = getUserId(authorization)
+
+    const result = await deleteTodo(todoId, userId)
 
     if (!result) {
       return {

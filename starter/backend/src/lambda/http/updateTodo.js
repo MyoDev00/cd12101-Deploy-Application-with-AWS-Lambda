@@ -11,10 +11,12 @@ export const handler = middy()
   )
   .handler(async (event) => {
     const todoId = event.pathParameters.todoId
+    const authorization = event.headers.Authorization
+    const userId = getUserId(authorization)
     const updatedTodo = JSON.parse(event.body)
 
     // TODO: Update a TODO item with the provided id using values in the "updatedTodo" object
-    var result = await updateTodo(updatedTodo, todoId)
+    const result = await updateTodo(updatedTodo, todoId, userId)
 
     if (!result) {
       return {

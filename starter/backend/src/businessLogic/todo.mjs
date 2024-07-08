@@ -10,20 +10,24 @@ export async function getAllTodos(userId) {
 
 export async function createTodo(createTodoRequest, userId) {
   const itemId = uuid.v4()
-  return await todoAccess.createTodo({
-    todoId: itemId,
-    userId: userId,
-    name: createTodoRequest.name,
-    dueDate: createTodoRequest.dueDate,
-    attachmentUrl: createTodoRequest.attachmentUrl,
-    createdAt: new Date().toISOString(),
-    completed: false
-  })
+  if (createTodoRequest?.name && createTodoRequest?.name.length >= 0) {
+    return await todoAccess.createTodo({
+      todoId: itemId,
+      userId: userId,
+      name: createTodoRequest.name,
+      dueDate: createTodoRequest.dueDate,
+      attachmentUrl: createTodoRequest.attachmentUrl,
+      createdAt: new Date().toISOString(),
+      completed: false
+    })
+  }
+  return undefined
 }
 
-export async function updateTodo(updateTodoRequest, todoId) {
+export async function updateTodo(updateTodoRequest, todoId, userId) {
   return await todoAccess.updateTodo({
     todoId: todoId,
+    userId: userId,
     name: updateTodoRequest.name,
     dueDate: updateTodoRequest.dueDate,
     attachmentUrl: updateTodoRequest.attachmentUrl,
@@ -31,15 +35,15 @@ export async function updateTodo(updateTodoRequest, todoId) {
   })
 }
 
-export async function deleteTodo(todoId) {
-  return await todoAccess.deleteTodo(todoId)
+export async function deleteTodo(todoId, userId) {
+  return await todoAccess.deleteTodo(todoId, userId)
 }
 
-export async function generateUploadUrl(todoId) {
+export async function generateUploadUrl(todoId, userId) {
   const uploadUrl = await getUploadUrl(todoId)
   const attachmentUrl = uploadUrl.split('?')[0]
 
-  await todoAccess.updateAttachment(todoId, attachmentUrl)
+  await todoAccess.updateAttachment(todoId, userId, attachmentUrl)
 
   console.log(`Generated and saved image url ${attachmentUrl}`)
   return uploadUrl

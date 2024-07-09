@@ -10,7 +10,7 @@ export async function getAllTodos(userId) {
 
 export async function createTodo(createTodoRequest, userId) {
   const itemId = uuid.v4()
-  if (createTodoRequest?.name && createTodoRequest?.name.length >= 0) {
+  if (createTodoRequest?.name && createTodoRequest?.name.length > 0) {
     return await todoAccess.createTodo({
       todoId: itemId,
       userId: userId,
